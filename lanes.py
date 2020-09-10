@@ -23,12 +23,22 @@ def get_lane_mask(image):
     mask = cv.bitwise_or(yellow_mask, white_mask)
     return mask
 
+def get_ROI_perspective(image):
+    (height, width, channel) = image.shape
+    mask = np.zeros((height, width), dtype=np.uint8)
+    triangle = np.array([[0, height], [width // 2, height // 2], [width, height]], dtype=np.int32)
+    cv.fillPoly(mask, [triangle], 255)
+    return mask
+
 if __name__ == "__main__":
     image = cv.imread('images/solidYellowCurve.jpg')
-    mask = get_lane_mask(image)
-    cv.imshow('lane mask white + yellow', mask)
     cv.imshow('image', image)
-
+    mask = get_lane_mask(image)
+    masked_color = cv.bitwise_and(image, image, mask=mask)
+    masked_ROI = get_ROI_perspective(image)
+    ROI = cv.bitwise_and(masked_color, masked_color, mask=masked_ROI)
+    cv.imshow('ROI', ROI)
+    print(masked_ROI.dtype)
     while True:
         if cv.waitKey(0) & 0xFF == ord('q'):
             break
