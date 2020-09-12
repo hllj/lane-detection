@@ -1,5 +1,6 @@
 import numpy as np
 import cv2 as cv
+from ROI import crop
 
 def convert2HSV(image):
     return cv.cvtColor(image, cv.COLOR_BGR2HSV)
@@ -23,13 +24,6 @@ def get_lane_mask(image):
     mask = cv.bitwise_or(yellow_mask, white_mask)
     return mask
 
-def get_ROI_perspective(image):
-    (height, width, channel) = image.shape
-    mask = np.zeros((height, width), dtype=np.uint8)
-    triangle = np.array([[0.1 * width, height], [width // 2, height // 2], [0.9 * width, height]], dtype=np.int32)
-    cv.fillPoly(mask, [triangle], 255)
-    return mask
-
 def draw_line(image, lines):
     image_lines = np.zeros_like(image)
     for line in lines:
@@ -38,15 +32,16 @@ def draw_line(image, lines):
     return image_lines
 
 def get_lane(image):
+    image_lines = image.copy()
+    image = crop(image)
+    cv.imshow('ROI', image)
     mask = get_lane_mask(image)
-    masked_color = cv.bitwise_and(image, image, mask=mask)
-    masked_ROI = get_ROI_perspective(image)
-    ROI = cv.bitwise_and(masked_color, masked_color, mask=masked_ROI)
-    ROI = cv.cvtColor(ROI, cv.COLOR_BGR2GRAY)
-    ROI = cv.Canny(ROI, 50, 100)
-    cv.imshow('Canny', ROI)
-    lines = cv.HoughLinesP(ROI, 2, np.pi/180, 60, np.array([]), minLineLength=30, maxLineGap=5)
-    image_lines = draw_line(image.copy(), lines)
+    image = cv.bitwise_and(image, image, mask=mask)
+    image = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
+    image = cv.Canny(image, 50, 100)
+    cv.imshow('Canny', image)
+    lines = cv.HoughLinesP(image, 2, np.pi/180, 60, np.array([]), minLineLength=20, maxLineGap=100)
+    image_lines = draw_line(image_lines, lines)
     return image_lines
 
 
