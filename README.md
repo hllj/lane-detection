@@ -1,8 +1,8 @@
-#Lane Detection 
+# Lane Detection 
 
 This is a pet project for detecting lane in a car driving. This project is only working with image processing and Hough Line Transform.
 
-#Usage 
+# Usage 
 
 ## Install libraries 
 **Create a python environment with virtualenv**
@@ -20,8 +20,8 @@ source <your environment name>/bin/activate
 pip install -r requiments.txt
 ```
 
-##Detect lane for an image 
+## Detect lane for an image 
 
-##Detect lane for a video
+## Detect lane for a video
 
-#Method
+# Method
